@@ -1,13 +1,13 @@
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-var _scales = [
+const _scales = [
   { name: "major", position: [0,6] },
   { name: "minor", position: [1,6] },
   { name: "harmonic minor", position: [2,6] }
 ];
 
-var _notes = [
+const _notes = [
   { name: "C", position: [0,4]},
   { name: "C#", position: [0,3]},
   { name: "D", position: [1,4]},

@@ -13,16 +13,25 @@ Application = function(pad, options)
   this.logic_ = new Logic(this.model_);
   this.launchpadBuffer_ = new LaunchpadScreenBuffer();
   this.installView(new PlayView(this.model_));
+  this.viewForRelease_ = new Array();
 
   this.pad_.on('key', k => {
     if (!this.handleKey(k))
     {
-      this.currentView_.handleKey(k);
+      const keyIndex = k.x + k.y * 9;
+      if (k.pressed)
+      {
+        // Remember which view handled a particular even so we can send the off state
+        this.viewForRelease_[keyIndex] = this.currentView_;
+        this.currentView_.handleKey(k);
+      }
+      else
+      {
+        this.viewForRelease_[keyIndex].handleKey(k);
+        this.viewForRelease_[keyIndex] = null;
+      }
     }
-    else
-    {
-      this.redraw();
-    }
+    this.redraw();
   })
 
   this.logic_.on('noteon', n => this.midiOutput_.sendNoteOn(n));

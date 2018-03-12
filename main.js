@@ -25,4 +25,6 @@ pad.connect().then( () => {     // Auto-detect Launchpad
    device: midiPortForPlatform()
   });
   app.run();
-});
+}).catch(e => {
+    console.log(e);
+})

@@ -1,7 +1,7 @@
-const Tonal = require("tonal");
-
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+
+require ("./domain.js");
 
 Logic = function(model)
 {
@@ -26,6 +26,9 @@ Logic.prototype.processCommand = function(m)
     case 'chord':
       this.handleChord(m.value.degree, m.value.pressed);
       break;
+    case 'invert':
+      this.model_.invert = m.value;
+      break;
     default:
       console.log("unknown command to process " + JSON.stringify(m));
   }
@@ -33,20 +36,13 @@ Logic.prototype.processCommand = function(m)
 
 Logic.prototype.handleChord = function(degree, pressed)
 {
-  var intervals = Tonal.Scale.intervals(this.model_.scale);
+  const chordName = degreeChord(this.model_.root, this.model_.scale, degree);
+  const outputChord = this.model_.invert ? invertChord(chordName) : chordName;
 
-  var chordIntervals= [0,2,4].map(d => {
-    var offset = d + degree;
-    var octave = Tonal.Interval.fromSemitones(12 * Math.floor(offset / intervals.length));
-    var interval = intervals[offset % intervals.length];
-    return Tonal.Distance.add(interval, octave);
-  }, this);
-
-  var rootNote = this.model_.root + this.model_.octave;
-  var notes = chordIntervals.map(i => {
-    return Tonal.transpose(rootNote,i);
-  })
-
-  console.log(notes);
-  this.emit(pressed?"noteon":"noteoff", notes.map(Tonal.Note.midi));
+  if (pressed)
+  {
+    console.log(outputChord);
+  }
+  const notes = notesForChord(outputChord, this.model_.octave);
+  this.emit(pressed?"noteon":"noteoff", translateToMidi(notes));
 }

@@ -26,7 +26,7 @@ PlayView.prototype.draw = function(screenBuffer)
   for (var index = 0; index < intervals.length; index++)
   {
     const chord = degreeChord(this.model_.root, this.model_.scale, index);
-    const inverted = invertChord(chord);
+    const inverted = invertChordType(chord);
     const chordType = Chord.tokenize(this.model_.invert ? inverted : chord)[1];
     screenBuffer.col(_colorMap[chordType], [0,7-index]);
   }

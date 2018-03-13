@@ -1,6 +1,8 @@
 const Tonal = require("tonal");
 const Detect = require("tonal-detector")
 
+// returns the chord of the degree for a given key
+
 degreeChord = function (root, scale, degree)
 {
   const note = Tonal.Scale.notes(root, scale)[degree];
@@ -28,6 +30,8 @@ degreeChord = function (root, scale, degree)
   return chordName;
 }
 
+// returns the notes for a chord
+
 notesForChord = function (chordName, octave)
 {
   var intervals = Tonal.Chord.intervals(chordName);
@@ -41,7 +45,9 @@ translateToMidi = function (notes)
   return notes.map(Tonal.Note.midi);
 }
 
-invertChord = function (chord)
+// Invert major / minor chords
+
+invertChordType = function (chord)
 {
   var _inversionMap =
   {
@@ -53,4 +59,70 @@ invertChord = function (chord)
 
   const token = Tonal.Chord.tokenize(chord);
   return token[0] + _inversionMap[token[1]];
+}
+
+// Apply inversion
+
+invertChord = function(notes, amount)
+{
+  const sign = Math.sign(amount);
+  const count = Math.abs(amount);
+  const offset = Tonal.Interval.fromSemitones(12 * sign);
+
+  for (var i = 0; i< count; i++)
+  {
+    switch(sign)
+    {
+      case 1:
+        var lowest = notes.shift();
+        notes.push(Tonal.transpose(lowest, offset));
+        break;
+
+      case -1:
+        var highest = notes.pop();
+        notes.unshift(Tonal.transpose(highest, offset));
+        break;
+    }
+  }
+  return notes;
+}
+
+//------------------------------------------------------------------------------
+
+// Computes the center of gravity for a group of notes
+
+var noteGravityCenter = function(notes)
+{
+  var sum = 0.0;
+  notes.forEach(function(note)
+    {
+      sum += Tonal.Note.midi(note);
+    });
+  return sum / notes.length;
+}
+
+// Computes the distance between two chords
+
+var computeDistance = function(noteList1, noteList2)
+{
+  return noteGravityCenter(noteList2) - noteGravityCenter(noteList1);
+}
+
+
+rectifyChord = function(noteListFrom, noteListTo)
+{
+  var d = computeDistance(noteListFrom, noteListTo);
+  var sign = Math.sign(d);
+  d = Math.abs(d);
+  var mind = 1000;
+
+  var result = noteListTo;
+  while(mind > d)
+  {
+    mind =d;
+    result = invertChord(result, -sign);
+    d = Math.abs(computeDistance(noteListFrom, result));
+  }
+  result = invertChord(result, sign);
+  return result;
 }

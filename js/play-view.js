@@ -2,6 +2,8 @@ const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const Scale = require("tonal-scale");
 const Chord = require("tonal-chord");
+const Distance = require("tonal-distance");
+const Interval = require("tonal-interval");
 
 require('./domain.js')
 
@@ -13,10 +15,28 @@ PlayView = function(model)
   var intervals = Scale.intervals(this.model_.scale);
   for (var index = 0; index < intervals.length; index++)
   {
+    // adds the chord's degree
     const chord = degreeChord(this.model_.root, this.model_.scale, index);
     this.chords_.push({name: chord, position: [0, 7 - index]});
+    // look if we need to add a off-scale
+    var needOffscale = false;
+    if (index < intervals.length -1)
+    {
+      const distance = Distance.subtract(intervals[index+1], intervals[index]);
+      needOffscale = (Interval.semitones(distance) > 1);
+    }
+    else {
+
+      needOffscale = (intervals[index] != "7M");
+    }
+
+    if (needOffscale)
+    {
+      const t = Chord.tokenize(chord);
+      const sharpie = Distance.transpose(t[0],"2m")+t[1];
+      this.chords_.push({name: sharpie, position: [1, 7 - index]});
+    }
   }
-  console.log(this.chords_);
 }
 
 util.inherits(PlayView, EventEmitter);

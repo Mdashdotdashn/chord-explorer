@@ -28,7 +28,7 @@ Logic.prototype.processCommand = function(m)
       this.updateTonicChord();
       break;
     case 'chord':
-      this.handleChord(m.value.degree, m.value.pressed);
+      this.handleChord(m.value.name, m.value.pressed);
       break;
     case 'invert':
       this.model_.invert = m.value;
@@ -45,10 +45,9 @@ Logic.prototype.updateTonicChord = function()
   console.log("Tonic: " + chordName + " / "+ this.tonicChord_);
 }
 
-Logic.prototype.handleChord = function(degree, pressed)
+Logic.prototype.handleChord = function(name, pressed)
 {
-  const chordName = degreeChord(this.model_.root, this.model_.scale, degree);
-  const outputChord = this.model_.invert ? invertChordType(chordName) : chordName;
+  const outputChord = this.model_.invert ? invertChordType(name) : name;
 
   var notes = notesForChord(outputChord, this.model_.octave);
   rectified = rectifyChord(this.tonicChord_, notes);

@@ -12,11 +12,13 @@ MidiOutput = function(outputName)
     }
   }, this)
   this.channel_ = 0;
+  this.notes_ = new Array(128).fill(0)
 }
 
 MidiOutput.prototype.sendNoteOn = function(notes)
 {
   notes.forEach(n => {
+    this.notes_[n]++;
     this.output_.send('noteon', {
       note: n,
       velocity: 100,
@@ -28,10 +30,13 @@ MidiOutput.prototype.sendNoteOn = function(notes)
 MidiOutput.prototype.sendNoteOff = function(notes)
 {
   notes.forEach(n => {
-    this.output_.send('noteoff', {
-      note: n,
-      velocity: 100,
-      channel: this.channel_
-    }, this);
+    if (this.notes_[n]-- ==0)
+    {
+      this.output_.send('noteoff', {
+        note: n,
+        velocity: 100,
+        channel: this.channel_
+      }, this);
+    }
   })
 }

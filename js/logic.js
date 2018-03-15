@@ -1,11 +1,14 @@
-var EventEmitter = require('events').EventEmitter;
-var util = require('util');
+const EventEmitter = require('events').EventEmitter;
+const util = require('util');
+const Interval = require('tonal-interval');
+const Distance = require('tonal-distance');
 
 require ("./domain.js");
 
 Logic = function(model)
 {
   this.model_ = model;
+  this.baseInversion_ = -2;
   this.updateTonicChord();
 }
 
@@ -41,7 +44,8 @@ Logic.prototype.processCommand = function(m)
 Logic.prototype.updateTonicChord = function()
 {
   const chordName = degreeChord(this.model_.root, this.model_.scale, 0);
-  this.tonicChord_ = notesForChord(chordName, this.model_.octave);
+  const notes = notesForChord(chordName, this.model_.octave);
+  this.tonicChord_ = this.baseInversion_ < 0 ? invertChord(notes, this.baseInversion_) : notes;
   console.log("Tonic: " + chordName + " / "+ this.tonicChord_);
 }
 
@@ -50,9 +54,10 @@ Logic.prototype.handleChord = function(name, pressed)
   const outputChord = this.model_.invert ? invertChordType(name) : name;
 
   var notes = notesForChord(outputChord, this.model_.octave);
+  var rootTranspose = (this.baseInversion_ < 0) ? "-15P" : "-8P";
+  var rootnote = Distance.transpose(notes[0], rootTranspose);
   rectified = rectifyChord(this.tonicChord_, notes);
-
-  var rootnote = notes[0];
+  rectified.push(rootnote);
 
 //  inverted = invertChord(notes,-2);
 

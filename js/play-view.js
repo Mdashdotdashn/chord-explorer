@@ -67,6 +67,7 @@ PlayView.prototype.emitMessage = function(message,value)
   this.emit("command", {name: message, value: value});
 }
 
+
 PlayView.prototype.handleKey = function(k)
 {
   if ((k.x == 8) && (k.y == 7))

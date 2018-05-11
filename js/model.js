@@ -3,5 +3,5 @@ Model = function()
 {
   this.root = 'C';
   this.scale = 'major';
-  this.octave = 3;
+  this.octave = 4;
 }

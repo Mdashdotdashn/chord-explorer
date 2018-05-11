@@ -4,7 +4,6 @@ var util = require('util');
 const _scales = [
   { name: "major", position: [0,6] },
   { name: "minor", position: [1,6] },
-  { name: "harmonic minor", position: [2,6] }
 ];
 
 const _notes = [

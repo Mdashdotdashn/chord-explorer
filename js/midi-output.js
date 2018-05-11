@@ -5,6 +5,7 @@ MidiOutput = function(outputName)
   var lowercaseOutName = outputName.toLowerCase();
   var outputs = easymidi.getOutputs();
   outputs.forEach(o => {
+    console.log(o.toLowerCase());
     if (o.toLowerCase().indexOf(lowercaseOutName) != -1)
     {
       console.log("Using midi output "+o);
@@ -18,19 +19,23 @@ MidiOutput = function(outputName)
 MidiOutput.prototype.sendNoteOn = function(notes)
 {
   notes.forEach(n => {
-    this.notes_[n]++;
-    this.output_.send('noteon', {
-      note: n,
-      velocity: 100,
-      channel: this.channel_
-    }, this);
+    this.notes_[n]+=1;
+    if (this.notes_[n] == 1)
+    {
+      this.output_.send('noteon', {
+  	      note: n,
+  	      velocity: 100,
+  	      channel: this.channel_
+  	     }, this);
+     }
   })
 }
 
 MidiOutput.prototype.sendNoteOff = function(notes)
 {
   notes.forEach(n => {
-    if (this.notes_[n]-- ==0)
+    this.notes_[n]-=1;
+    if (this.notes_[n] == 0)
     {
       this.output_.send('noteoff', {
         note: n,

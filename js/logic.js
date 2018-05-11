@@ -8,7 +8,7 @@ require ("./domain.js");
 Logic = function(model)
 {
   this.model_ = model;
-  this.baseInversion_ = -2;
+  this.baseInversion_ = 0;
   this.updateTonicChord();
 }
 
@@ -49,12 +49,23 @@ Logic.prototype.updateTonicChord = function()
   console.log("Tonic: " + chordName + " / "+ this.tonicChord_);
 }
 
+var chordCache = [];
+
 Logic.prototype.handleChord = function(name, pressed)
 {
-  const outputChord = this.model_.invert ? invertChordType(name) : name;
+  outputChord = this.model_.invert ? invertChordType(name) : name;
 
+  if (pressed)
+  {
+    chordCache[name] = outputChord;
+  }
+  else
+  {
+    outputChord = chordCache[name];
+  }
   var notes = notesForChord(outputChord, this.model_.octave);
-  var rootTranspose = (this.baseInversion_ < 0) ? "-15P" : "-8P";
+//  var rootTranspose = (this.baseInversion_ < 0) ? "-15P" : "-8P";
+  var rootTranspose = "-15P";
   var rootnote = Distance.transpose(notes[0], rootTranspose);
   rectified = rectifyChord(this.tonicChord_, notes);
   rectified.push(rootnote);

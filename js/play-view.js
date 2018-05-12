@@ -7,17 +7,16 @@ const Interval = require("tonal-interval");
 
 require('./domain.js')
 
-PlayView = function(model)
+buildChordArray = function(tonic, scale)
 {
-  this.model_ = model;
-  this.chords_ = new Array();
+  var chordArray = new Array();
   // prepare the 7 chord degrees
-  var intervals = Scale.intervals(this.model_.scale);
+  var intervals = Scale.intervals(scale);
   for (var index = 0; index < intervals.length; index++)
   {
     // adds the chord's degree
-    const chord = degreeChord(this.model_.root, this.model_.scale, index);
-    this.chords_.push({name: chord, position: [0, 7 - index]});
+    const chord = degreeChord(tonic, scale, index);
+    chordArray.push({name: chord, position: [0, 7 - index]});
     // look if we need to add a off-scale
     var needOffscale = false;
     if (index < intervals.length -1)
@@ -26,7 +25,6 @@ PlayView = function(model)
       needOffscale = (Interval.semitones(distance) > 1);
     }
     else {
-
       needOffscale = (intervals[index] != "7M");
     }
 
@@ -34,9 +32,20 @@ PlayView = function(model)
     {
       const t = Chord.tokenize(chord);
       const sharpie = Distance.transpose(t[0],"2m")+t[1];
-      this.chords_.push({name: sharpie, position: [1, 7 - index]});
+      chordArray.push({name: sharpie, position: [1, 7 - index]});
     }
   }
+  return chordArray;
+}
+
+
+/*---------------------------------------------------------------------------*/
+
+PlayView = function(model)
+{
+  this.model_ = model;
+  this.chords_ = buildChordArray(this.model_.root, this.model_.scale);
+  this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [7,i]}});
 }
 
 util.inherits(PlayView, EventEmitter);
@@ -60,6 +69,15 @@ PlayView.prototype.draw = function(screenBuffer)
   }
 
   screenBuffer.col(this.model_.invert ? 'A' : 'G', [8,7]);
+
+  for (var index = 0; index < this.voice_.length; index++)
+  {
+    if (this.model_.activeVoices[index])
+    {
+      console.log(this.voice_[index].position);
+      screenBuffer.col('G', this.voice_[index].position);
+    }
+  }
 }
 
 PlayView.prototype.emitMessage = function(message,value)
@@ -82,6 +100,15 @@ PlayView.prototype.handleKey = function(k)
     if ((position[0] == k[0]) && (position[1] == k[1]))
     {
       this.emitMessage("chord", { name: this.chords_[index].name, pressed: k.pressed});
+    }
+  }
+
+  for (var index = 0; index < this.voice_.length; index++)
+  {
+    const position = this.voice_[index].position;
+    if ((position[0] == k[0]) && (position[1] == k[1]))
+    {
+      this.emitMessage("voice", { pressed: k.pressed, index: this.voice_[index].index});
     }
   }
 }

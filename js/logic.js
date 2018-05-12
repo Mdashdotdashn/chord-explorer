@@ -36,6 +36,12 @@ Logic.prototype.processCommand = function(m)
     case 'invert':
       this.model_.invert = m.value;
       break;
+    case 'voice':
+      if (m.value.pressed)
+      {
+        this.model_.activeVoices[m.value.index] = !this.model_.activeVoices[m.value.index];
+      }
+      break;
     default:
       console.log("unknown command to process " + JSON.stringify(m));
   }
@@ -64,17 +70,17 @@ Logic.prototype.handleChord = function(name, pressed)
     outputChord = chordCache[name];
   }
   var notes = notesForChord(outputChord, this.model_.octave);
-//  var rootTranspose = (this.baseInversion_ < 0) ? "-15P" : "-8P";
   var rootTranspose = "-15P";
   var rootnote = Distance.transpose(notes[0], rootTranspose);
   rectified = rectifyChord(this.tonicChord_, notes);
   rectified.push(rootnote);
 
-//  inverted = invertChord(notes,-2);
-
   if (pressed)
   {
     console.log(outputChord + " / " + rectified);
   }
-  this.emit(pressed?"noteon":"noteoff", translateToMidi(rectified));
+
+  var midiNotes = translateToMidi(rectified);
+  midiNotes.sort();
+  this.emit(pressed?"noteon":"noteoff", midiNotes);
 }

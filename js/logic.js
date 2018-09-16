@@ -81,6 +81,6 @@ Logic.prototype.handleChord = function(name, pressed)
   }
 
   var midiNotes = translateToMidi(rectified);
-  midiNotes.sort();
-  this.emit(pressed?"noteon":"noteoff", midiNotes);
+  var outputNotes = midiNotes.sort().filter((n,i) => { return this.model_.activeVoices[i]; }, this);
+  this.emit(pressed?"noteon":"noteoff", outputNotes);
 }

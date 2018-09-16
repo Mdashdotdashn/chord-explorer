@@ -45,7 +45,7 @@ PlayView = function(model)
 {
   this.model_ = model;
   this.chords_ = buildChordArray(this.model_.root, this.model_.scale);
-  this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [7,i]}});
+  this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [7,3-i]}});
 }
 
 util.inherits(PlayView, EventEmitter);
@@ -74,7 +74,6 @@ PlayView.prototype.draw = function(screenBuffer)
   {
     if (this.model_.activeVoices[index])
     {
-      console.log(this.voice_[index].position);
       screenBuffer.col('G', this.voice_[index].position);
     }
   }

@@ -1,5 +1,10 @@
 var easymidi = require("easymidi");
 
+DumpNotes = function(notes)
+{
+  notes.forEach( (n,i) => { if (n !=0) console.log(""+i+" : "+n) });
+}
+
 MidiOutput = function(outputName)
 {
   var lowercaseOutName = outputName.toLowerCase();
@@ -29,19 +34,22 @@ MidiOutput.prototype.sendNoteOn = function(notes)
   	     }, this);
      }
   })
+  DumpNotes(this.notes_);
 }
 
 MidiOutput.prototype.sendNoteOff = function(notes)
 {
   notes.forEach(n => {
     this.notes_[n]-=1;
-    if (this.notes_[n] == 0)
+    if (this.notes_[n] <= 0)
     {
       this.output_.send('noteoff', {
         note: n,
         velocity: 100,
         channel: this.channel_
       }, this);
+      this.notes_[n] = 0;
     }
   })
+  DumpNotes(this.notes_);
 }

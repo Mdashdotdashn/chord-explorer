@@ -5,8 +5,9 @@ function midiPortForPlatform()
   var devices =
   {
   	dar: "iac",
-  	win: "microsoft",
-  //	win: "loop",
+//  	win: "micr",
+//    win:  "usb",
+  	win: "loop",
   	lin: "through"
   }
 

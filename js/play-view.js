@@ -12,6 +12,11 @@ buildChordArray = function(tonic, scale)
   var chordArray = new Array();
   // prepare the 7 chord degrees
   var intervals = Scale.intervals(scale);
+  if (intervals.length != 7)
+  {
+    throw "Only supporting major/minor based scales";
+  }
+
   for (var index = 0; index < intervals.length; index++)
   {
     // adds the chord's degree

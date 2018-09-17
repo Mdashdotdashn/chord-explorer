@@ -2,7 +2,7 @@ var easymidi = require("easymidi");
 
 DumpNotes = function(notes)
 {
-  notes.forEach( (n,i) => { if (n !=0) console.log(""+i+" : "+n) });
+//  notes.forEach( (n,i) => { if (n !=0) console.log(""+i+" : "+n) });
 }
 
 MidiOutput = function(outputName)

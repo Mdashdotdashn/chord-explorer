@@ -10,4 +10,6 @@ Model = function()
   // Assuming a 4 part harmony, specifies whether a part is active or not
   // part 0 is the bass
   this.activeVoices = [true, true, true, true];
+  // History
+  this.history = [{chord: "CM"},{chord: "AbM"},{chord: "FM"},{chord: "GM"},{chord: "GbM"},{chord: "DM"}]
 }

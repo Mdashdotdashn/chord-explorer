@@ -51,6 +51,7 @@ PlayView = function(model)
   this.model_ = model;
   this.chords_ = buildChordArray(this.model_.root, this.model_.scale);
   this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [4 + i, 8]}});
+  this.invertKey_ = false;
 }
 
 util.inherits(PlayView, EventEmitter);
@@ -69,7 +70,7 @@ PlayView.prototype.draw = function(screenBuffer)
   {
     const chord = this.chords_[index].name;
     const inverted = invertChordType(chord);
-    const chordType = Chord.tokenize(this.model_.invert ? inverted : chord)[1];
+    const chordType = Chord.tokenize(this.invertKey_ ? inverted : chord)[1];
     screenBuffer.col(_colorMap[chordType], this.chords_[index].position);
   }
 
@@ -94,7 +95,7 @@ PlayView.prototype.handleKey = function(k)
 {
   if ((k.x == 8) && (k.y == 7))
   {
-    this.emitMessage("invert", k.pressed);
+    this.invertKey_ = k.pressed;
     return;
   }
 
@@ -103,7 +104,7 @@ PlayView.prototype.handleKey = function(k)
     const position = this.chords_[index].position;
     if ((position[0] == k[0]) && (position[1] == k[1]))
     {
-      this.emitMessage("chord", { name: this.chords_[index].name, pressed: k.pressed});
+      this.emitMessage("chord", { name: this.chords_[index].name, invert: this.invertKey_, pressed: k.pressed});
     }
   }
 

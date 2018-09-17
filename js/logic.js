@@ -31,10 +31,7 @@ Logic.prototype.processCommand = function(m)
       this.updateTonicChord();
       break;
     case 'chord':
-      this.handleChord(m.value.name, m.value.pressed);
-      break;
-    case 'invert':
-      this.model_.invert = m.value;
+      this.handleChord(m.value.name, m.value.invert, m.value.pressed);
       break;
     case 'voice':
       if (m.value.pressed)
@@ -57,12 +54,12 @@ Logic.prototype.updateTonicChord = function()
 
 var noteCache = [];
 
-Logic.prototype.emitNotesForChords = function(name, pressed)
+Logic.prototype.emitNotesForChords = function(name, invert, pressed)
 {
   if (pressed)
   {
     // Compute the note set from the original chord and alterations
-    outputChord = this.model_.invert ? invertChordType(name) : name;
+    outputChord = invert ? invertChordType(name) : name;
     var notes = notesForChord(outputChord, this.model_.octave);
     var rootTranspose = "-15P";
     var rootnote = Distance.transpose(notes[0], rootTranspose);
@@ -81,7 +78,7 @@ Logic.prototype.emitNotesForChords = function(name, pressed)
 }
 
 // Receives the chord event from the chord keyboard layout
-Logic.prototype.handleChord = function(name, pressed)
+Logic.prototype.handleChord = function(name, invert, pressed)
 {
-  this.emitNotesForChords(name, pressed);
+  this.emitNotesForChords(name, invert, pressed);
 }

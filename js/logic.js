@@ -55,32 +55,33 @@ Logic.prototype.updateTonicChord = function()
   console.log("Tonic: " + chordName + " / "+ this.tonicChord_);
 }
 
-var chordCache = [];
+var noteCache = [];
 
+Logic.prototype.emitNotesForChords = function(name, pressed)
+{
+  if (pressed)
+  {
+    // Compute the note set from the original chord and alterations
+    outputChord = this.model_.invert ? invertChordType(name) : name;
+    var notes = notesForChord(outputChord, this.model_.octave);
+    var rootTranspose = "-15P";
+    var rootnote = Distance.transpose(notes[0], rootTranspose);
+    rectified = rectifyChord(this.tonicChord_, notes);
+    rectified.push(rootnote);
+    var outputNotes = rectified.sort().filter((n,i) => { return this.model_.activeVoices[i]; }, this);
+
+    console.log(outputChord + " / " + outputNotes);
+
+    noteCache[name] = outputNotes;
+  }
+
+  var midiNotes = translateToMidi(noteCache[name]);
+  console.log(midiNotes);
+  this.emit(pressed?"noteon":"noteoff", midiNotes);
+}
+
+// Receives the chord event from the chord keyboard layout
 Logic.prototype.handleChord = function(name, pressed)
 {
-  outputChord = this.model_.invert ? invertChordType(name) : name;
-
-  if (pressed)
-  {
-    chordCache[name] = outputChord;
-  }
-  else
-  {
-    outputChord = chordCache[name];
-  }
-  var notes = notesForChord(outputChord, this.model_.octave);
-  var rootTranspose = "-15P";
-  var rootnote = Distance.transpose(notes[0], rootTranspose);
-  rectified = rectifyChord(this.tonicChord_, notes);
-  rectified.push(rootnote);
-
-  if (pressed)
-  {
-    console.log(outputChord + " / " + rectified);
-  }
-
-  var midiNotes = translateToMidi(rectified);
-  var outputNotes = midiNotes.sort().filter((n,i) => { return this.model_.activeVoices[i]; }, this);
-  this.emit(pressed?"noteon":"noteoff", outputNotes);
+  this.emitNotesForChords(name, pressed);
 }

@@ -2,6 +2,7 @@ const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const Interval = require('tonal-interval');
 const Distance = require('tonal-distance');
+const Tonal = require('tonal');
 
 require ("./domain.js");
 
@@ -61,11 +62,14 @@ Logic.prototype.emitNotesForChords = function(name, invert, pressed)
     // Compute the note set from the original chord and alterations
     outputChord = invert ? invertChordType(name) : name;
     var notes = notesForChord(outputChord, this.model_.octave);
+    var rectified = rectifyChord(this.tonicChord_, notes);
+
     var rootTranspose = "-15P";
-    var rootnote = Distance.transpose(notes[0], rootTranspose);
-    rectified = rectifyChord(this.tonicChord_, notes);
-    rectified.push(rootnote);
-    var outputNotes = rectified.sort().filter((n,i) => { return this.model_.activeVoices[i]; }, this);
+    var bassnote = Distance.transpose(notes[0], rootTranspose);
+    rectified.push(bassnote);
+
+    var sorted = rectified.sort((a,b) => Tonal.Note.midi(a) - Tonal.Note.midi(b));
+    var outputNotes = sorted.filter((n,i) => { return this.model_.activeVoices[i]; }, this);
 
     console.log(outputChord + " / " + outputNotes);
 

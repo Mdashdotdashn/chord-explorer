@@ -3,5 +3,20 @@
   "description": "chord-explorer",
   "version": "0.0.1",
   "private": true,
-  "dependencies": {}
+  "dependencies": {},
+  "main": "main.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://Mdashdotdashn@github.com/Mdashdotdashn/chord-explorer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mdashdotdashn/chord-explorer/issues"
+  },
+  "homepage": "https://github.com/Mdashdotdashn/chord-explorer#readme"
 }

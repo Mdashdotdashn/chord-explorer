@@ -62,10 +62,11 @@ Logic.prototype.emitNotesForChords = function(name, invert, pressed)
     // Compute the note set from the original chord and alterations
     outputChord = invert ? invertChordType(name) : name;
     var notes = notesForChord(outputChord, this.model_.octave);
-    var rectified = rectifyChord(this.tonicChord_, notes);
 
     var rootTranspose = "-15P";
     var bassnote = Distance.transpose(notes[0], rootTranspose);
+
+    var rectified = rectifyChord(this.tonicChord_, notes);
     rectified.push(bassnote);
 
     var sorted = rectified.sort((a,b) => Tonal.Note.midi(a) - Tonal.Note.midi(b));

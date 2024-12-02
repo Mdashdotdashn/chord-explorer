@@ -59,15 +59,26 @@ Logic.prototype.emitNotesForChords = function(name, invert, pressed)
 {
   if (pressed)
   {
-    // Compute the note set from the original chord and alterations
+    // Compute chord to be played from the pressed chord
+    // by applying alterations like inversion
     outputChord = invert ? invertChordType(name) : name;
+
+    // Extract the notes from the chord
     var notes = notesForChord(outputChord, this.model_.octave);
 
+    // Calculate a bass note consisting of the root two octave
+    // down and the fifth above it. These notes won't be reharmonized
+    // through inversion
+    var bassnotes = new Array(2);
     var rootTranspose = "-15P";
-    var bassnote = Distance.transpose(notes[0], rootTranspose);
+    bassnotes[0] = Distance.transpose(notes[0], rootTranspose);
+    bassnotes[1] = Distance.transpose(bassnotes[0], "5P");
 
+    // Rectify the notes of the chord (i.e. place it close to the gravity center)
     var rectified = rectifyChord(this.tonicChord_, notes);
-    rectified.push(bassnote);
+    // Add the bass notes
+    rectified.push(bassnotes[0]);
+    rectified.push(bassnotes[1]);
 
     var sorted = rectified.sort((a,b) => Tonal.Note.midi(a) - Tonal.Note.midi(b));
     var outputNotes = sorted.filter((n,i) => { return this.model_.activeVoices[i]; }, this);

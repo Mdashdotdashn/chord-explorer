@@ -61,7 +61,7 @@ PlayView = function(model)
   this.model_ = model;
   this.chords_ = buildChordArray(this.model_.root, this.model_.scale);
   this.history_ = buildHistoryArray();
-  this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [4 + i, 8]}});
+  this.voice_ = this.model_.activeVoices.map((v,i) => { return {index: i, position: [3 + i, 8]}});
   this.invertKey_ = false;
 }
 
